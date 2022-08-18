@@ -361,7 +361,11 @@ class HiveDialect(default.DefaultDialect):
         query = 'SHOW TABLES'
         if schema:
             query += ' IN ' + self.identifier_preparer.quote_identifier(schema)
-        return [row[0] for row in connection.execute(query)]
+        rows = connection.execute(query)
+        for row in rows:
+            if len(row) >= 2:
+                return [row[1] for row in rows]
+        return [row[0] for row in rows]
 
     def do_rollback(self, dbapi_connection):
         # No transactions for Hive
